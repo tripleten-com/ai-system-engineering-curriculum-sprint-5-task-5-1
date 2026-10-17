@@ -83,6 +83,35 @@ def test_current_repository_satisfies_the_integrity_contract() -> None:
     assert authoring.main() == 0
 
 
+@pytest.mark.authoring
+@pytest.mark.parametrize(
+    ("dockerfiles", "expected"),
+    [
+        ({"api": True, "worker": True}, []),
+        ({"app": True}, []),
+        ({"app": False}, ["app runtime image must declare USER coldline"]),
+        ({"api": True, "worker": False}, ["worker runtime image must declare USER coldline"]),
+        ({}, ["infra/containers holds no *.Dockerfile runtime image"]),
+    ],
+)
+def test_container_policy_checks_every_runtime_image(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    dockerfiles: dict[str, bool],
+    expected: list[str],
+) -> None:
+    """A Task may replace the api and worker images with its own; each must stay unprivileged."""
+    containers = tmp_path / "infra" / "containers"
+    containers.mkdir(parents=True)
+    for name, unprivileged in dockerfiles.items():
+        user = "USER coldline\n" if unprivileged else ""
+        (containers / f"{name}.Dockerfile").write_text(
+            f'FROM python:3.12-slim\n{user}CMD ["true"]\n', encoding="utf-8"
+        )
+    monkeypatch.setattr(authoring, "ROOT", tmp_path)
+    assert authoring._check_container_policy() == expected
+
+
 @pytest.mark.parametrize(
     "fixture",
     ["infra/corpus/README.md", "infra/judge/README.md", "infra/profiles/README.md"],

@@ -386,13 +386,19 @@ def _check_compose() -> list[str]:
 
 
 def _check_container_policy() -> list[str]:
-    """Keep the API and worker runtime images explicitly unprivileged."""
+    """Keep every runtime image explicitly unprivileged.
+
+    The starter ships an api and a worker image; a later Task may replace them with
+    its own, so every ``*.Dockerfile`` under infra/containers is checked by name.
+    """
+    dockerfiles = sorted((ROOT / "infra/containers").glob("*.Dockerfile"))
+    if not dockerfiles:
+        return ["infra/containers holds no *.Dockerfile runtime image"]
     failures: list[str] = []
-    for service in ("api", "worker"):
-        dockerfile = ROOT / "infra/containers" / f"{service}.Dockerfile"
+    for dockerfile in dockerfiles:
         text = dockerfile.read_text(encoding="utf-8")
         if "\nUSER coldline\n" not in text:
-            failures.append(f"{service} runtime image must declare USER coldline")
+            failures.append(f"{dockerfile.stem} runtime image must declare USER coldline")
     return failures
 
 

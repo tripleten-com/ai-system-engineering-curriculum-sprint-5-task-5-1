@@ -13,8 +13,9 @@ Tools:             Python 3.12, pytest, PostgreSQL, boto3, LocalStack
 
 import asyncio
 import time
+from collections.abc import Callable, Coroutine
 from datetime import UTC, datetime
-from typing import Any
+from typing import Any, NoReturn
 from uuid import uuid4
 
 import asyncpg
@@ -42,11 +43,26 @@ HANDLING_NOTE = "verify: the raw note is kept as written, +1 555 0199 included"
 
 
 class AlwaysFailProvider:
-    """Fail deterministically at the active model-provider boundary."""
+    """Fail deterministically at the active model-provider boundary.
+
+    Every member of the ``ModelProvider`` port fails the same way, including a
+    member a later Task adds to the port, so extending the port never requires
+    editing this verifier.
+    """
 
     async def summarize(self, request: ModelRequest) -> ModelAnswer:
         """Raise the fixed integration failure."""
         raise TimeoutError("integration provider failure")
+
+    def __getattr__(self, name: str) -> Callable[..., Coroutine[Any, Any, NoReturn]]:
+        """Answer any other port method with the same failure."""
+        if name.startswith("__"):
+            raise AttributeError(name)
+
+        async def fail(*args: object, **kwargs: object) -> NoReturn:
+            raise TimeoutError("integration provider failure")
+
+        return fail
 
 
 class NoProcedure:
