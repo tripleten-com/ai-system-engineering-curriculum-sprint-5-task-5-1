@@ -4,9 +4,9 @@
 
 File:              tests/contract/test_repository_structure.py
 Component:         Repository structure contract
-Purpose:           Keeps the student-visible tree small and predictable.
+Purpose:           Keeps the supplied tree in place while Project 5 students add their own.
 Interacts With:    Task root, src packages, docs, infrastructure, migrations, schemas, and tests
-Sprint/Task:       Sprint 4 — Project 4 / Task 4.5
+Sprint/Task:       Sprint 4 — Project 4 / Task 4.5; Project 5 starter (Task 5.1)
 Concepts:          Navigability, package ownership, repository integrity
 Tools:             Python 3.12, pytest
 """
@@ -46,25 +46,31 @@ IGNORED_PARTS = {
 
 
 def test_visible_content_is_grouped_into_the_expected_learning_zones() -> None:
-    """Reject extra visible root directories that fragment navigation."""
+    """Keep every supplied root directory; Project 5 students may add their own."""
     actual = {
         path.parts[0]
         for path in _tracked_task_paths()
         if len(path.parts) > 1 and not path.parts[0].startswith(".")
     }
 
-    assert actual == VISIBLE_CONTENT_DIRECTORIES
+    assert VISIBLE_CONTENT_DIRECTORIES <= actual, sorted(VISIBLE_CONTENT_DIRECTORIES - actual)
 
 
-def test_source_tree_exposes_exactly_six_flat_packages() -> None:
-    """Keep application code under the six selected responsibility names."""
-    actual = {
-        path.parts[1]
-        for path in _tracked_task_paths()
-        if len(path.parts) > 2 and path.parts[0] == "src"
-    }
+def test_source_tree_keeps_the_six_supplied_flat_packages() -> None:
+    """Keep the six supplied packages flat under src/; a student package sits beside them.
 
-    assert actual == SOURCE_PACKAGES
+    Project 5 students build the agent themselves, for example as `src/agent/`, so the
+    tree may grow. A supplied package that disappears still fails, and so does code
+    placed directly in `src/` instead of in a package.
+    """
+    tracked = _tracked_task_paths()
+    packages = {path.parts[1] for path in tracked if len(path.parts) > 2 and path.parts[0] == "src"}
+    loose_files = sorted(
+        str(path) for path in tracked if len(path.parts) == 2 and path.parts[0] == "src"
+    )
+
+    assert SOURCE_PACKAGES <= packages, sorted(SOURCE_PACKAGES - packages)
+    assert not loose_files, loose_files
 
 
 def _tracked_task_paths() -> set[PurePosixPath]:
