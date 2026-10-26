@@ -1,12 +1,13 @@
 # Coldline
 # File: .gitattributes
 # Component: Git text policy
-# Purpose: Keep text line endings stable across Windows and Linux.
-# Interacts With: Git checkout and CI
-# Sprint/Task: Sprint 2 — Task 2.6
-# Concepts: Cross-platform reproducibility
+# Purpose: Keep text line endings stable across Windows and Linux. Text files check out with
+#          LF everywhere, so a checkout never changes the bytes Docker copies into an image.
+# Interacts With: Git checkout, CI and the release image build context
+# Sprint/Task: Sprint 5 — Project 5 / starter (Task 5.1)
+# Concepts: Cross-platform reproducibility, reproducible builds
 # Tools: Git
 
-* text=auto
+* text=auto eol=lf
 *.sh text eol=lf
 *.mako text eol=lf

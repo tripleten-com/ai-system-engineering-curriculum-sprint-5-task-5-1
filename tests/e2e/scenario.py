@@ -7,7 +7,7 @@ Component:         End-to-end tests — Scenario
 Purpose:           Run the supplied baseline exception scenario with one of the emulator's
                     supplied responses and, optionally, one of the supplied handling notes.
 Interacts With:    External API, worker, storage, and telemetry; tests/fixtures/pii/notes.yaml
-Sprint/Task:       Sprint 4 — Project 4 / Task 4.5
+Sprint/Task:       Sprint 5 — Project 5 / starter (Task 5.1)
 Concepts:          Black-box workflow, durable identity, evidence, supplied bad answers,
                     supplied notes
 Tools:             Python 3.12, pytest
@@ -88,7 +88,7 @@ def main(argv: Sequence[str] = ()) -> int:
                 "jaeger_url": (f"http://localhost:{host_port('COLDLINE_JAEGER_HOST_PORT', 16686)}"),
                 "grafana_url": (
                     f"http://localhost:{host_port('COLDLINE_GRAFANA_HOST_PORT', 3000)}"
-                    "/d/coldline-task-1-1"
+                    "/d/coldline-diagnostics"
                 ),
             },
             indent=2,
