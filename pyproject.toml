@@ -134,6 +134,13 @@ files = [
 module = ["asyncpg", "boto3", "botocore", "botocore.*", "jsonschema", "yaml"]
 ignore_missing_imports = true
 
+# Build attestations would make the image ID change on every build under the containerd image
+# store (the default on new Docker Desktop, Docker Engine 29 and Codespaces installs), even when
+# nothing in the image changed. Without them the ID follows the content, which the release
+# candidate record in Project 5 relies on.
+[tool.poe.env]
+BUILDX_NO_DEFAULT_ATTESTATIONS = "1"
+
 [tool.poe.tasks]
 format = "ruff format ."
 format-check = "ruff format --check ."
@@ -191,7 +198,7 @@ authorization-checkpoint = "pytest tests/contract/test_authorization_checkpoint.
 # test may call the running services. An empty tests/student/ passes: the starter has none.
 student-tests = { script = "tests.student_tests:main", help = "Run your tests under tests/student" }
 # The vaccine exception end to end. Empty in the starter: you fill this command as the agent
-# grows, from Task 3 on, and the basic checks run it on every Task after that.
+# grows, from Task 3 on, and run it yourself before every submission after that; CI doesn't.
 demo = { cmd = "python -c \"print('poe demo: nothing is built yet. You fill this command as the agent grows.')\"", help = "Run the vaccine exception end to end" }
 test = ["unit", "contract"]
 preflight = "python infra/scripts/preflight.py"
