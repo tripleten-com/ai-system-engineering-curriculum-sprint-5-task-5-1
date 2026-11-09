@@ -30,7 +30,11 @@ python infra/scripts/bootstrap.py
 ./.tools/bin/uv run --frozen poe preflight
 ./.tools/bin/uv run --frozen poe start
 ./.tools/bin/uv run --frozen poe ready
+./.tools/bin/uv run --frozen poe ingest
 ```
+
+`poe ingest` loads the procedure corpus into the running stack; `poe start` doesn't, and a search
+on an empty corpus returns nothing. `poe verify` runs it for you.
 
 PowerShell and POSIX wrappers are available under `infra/scripts/`. After uv is on `PATH`, the
 shorter `uv run --frozen poe <task>` form works; in PowerShell on Windows the pinned binary is
