@@ -3,7 +3,7 @@
 This is your Project 5 repository. It starts where Project 4 ended: the complete Coldline
 platform, with the API, the worker, the token issuer, the guardrails, the redaction, the audit
 trail and the secret store. You build the agent here, in this one repository, from Task 1 to
-Task 16. Each Task starts from your own work in the previous one.
+Task 17. Each Task starts from your own work in the previous one.
 
 The starter adds four things to the Project 4 platform:
 
